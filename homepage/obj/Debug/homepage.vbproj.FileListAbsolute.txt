@@ -281,3 +281,4 @@ C:\Users\My PC\Documents\Visual Studio 2008\Projects\folder_project-master\homep
 C:\Users\My PC\Documents\Visual Studio 2008\Projects\folder_project-master\homepage\obj\Debug\homepage.SC_BSMA2.resources
 C:\Users\My PC\Documents\Visual Studio 2008\Projects\folder_project-master\homepage\obj\Debug\homepage.SC_BSMA3.resources
 C:\Users\My PC\Documents\Visual Studio 2008\Projects\folder_project-master\homepage\obj\Debug\homepage.SC_BSMA4.resources
+C:\Users\My PC\Documents\Visual Studio 2008\Projects\folder_project-master\homepage\bin\Debug\MySql.Data.dll

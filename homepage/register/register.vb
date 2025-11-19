@@ -19,6 +19,7 @@ Public Class register
         Next
         Return sb.ToString()
     End Function
+
     Private Sub register_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ' Maximize window on load
         Me.WindowState = FormWindowState.Maximized
@@ -203,14 +204,10 @@ Public Class register
         MonthCalendar1.Visible = False
     End Sub
 
-    Private Sub bd_Click(ByVal sender As Object, ByVal e As EventArgs) Handles bd.Click
-        MonthCalendar1.Visible = True
-
-    End Sub
     Private Sub bd_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bd.Click
-
         MonthCalendar1.Visible = True
     End Sub
+
     Private Sub sec_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles section.SelectedIndexChanged
         If section.SelectedItem Is Nothing Then
 
@@ -255,4 +252,46 @@ Public Class register
         Return sec
     End Function
 
+    Private Sub age_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles age.KeyPress
+        If Not Char.IsDigit(e.KeyChar) AndAlso e.KeyChar <> ChrW(Keys.Back) Then
+            e.Handled = True
+        End If
+    End Sub
+
+    Private Sub ct_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles ct.KeyPress
+        If Not Char.IsDigit(e.KeyChar) AndAlso e.KeyChar <> ChrW(Keys.Back) Then
+            e.Handled = True
+        End If
+    End Sub
+    Private Sub CapitalFirstLetter(ByVal cap As TextBox)
+        If cap.TextLength > 0 Then
+            Dim curPos As Integer = cap.SelectionStart
+            cap.Text = Char.ToUpper(cap.Text(0)) & cap.Text.Substring(1)
+            cap.SelectionStart = curPos
+        End If
+    End Sub
+
+    Private Sub ln_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ln.TextChanged
+        CapitalFirstLetter(ln)
+    End Sub
+
+    Private Sub fn_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles fn.TextChanged
+        CapitalFirstLetter(fn)
+    End Sub
+
+    Private Sub mi_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mi.TextChanged
+        CapitalFirstLetter(mi)
+    End Sub
+
+    Private Sub add_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles add.TextChanged
+        CapitalFirstLetter(add)
+    End Sub
+
+    Private Sub sa_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles sa.TextChanged
+        CapitalFirstLetter(sa)
+    End Sub
+
+    Private Sub un_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles un.TextChanged
+        CapitalFirstLetter(un)
+    End Sub
 End Class
