@@ -91,7 +91,7 @@ Public Class register
                     MessageBox.Show("Username already exists!")
                 Else
                     ' Insert new account
-                    Dim insertCmd As New MySqlCommand("INSERT INTO account(id, lastname, name, middlename, username, passwordusername, address, role, secques, secans, acc_status, course, subject, age, contact, gender, birthdate)  VALUES(@id, @lastname, @name, @middlename, @username, @passwordusername, @address, @role, @secques, @secans, 'OFF', @course, @subject, @age, @contact, @gender, @birthdate)", conn)
+                    Dim insertCmd As New MySqlCommand("INSERT INTO account(id, lastname, name, middlename, username, passwordusername, address, role, secques, secans, acc_status, course, subject, age, contact, gender, birthdate, section)  VALUES(@id, @lastname, @name, @middlename, @username, @passwordusername, @address, @role, @secques, @secans, 'OFF', @course, @subject, @age, @contact, @gender, @birthdate, @section)", conn)
 
                     insertCmd.Parameters.AddWithValue("@id", id.Text)
                     insertCmd.Parameters.AddWithValue("@lastname", ln.Text)
@@ -110,7 +110,7 @@ Public Class register
                     insertCmd.Parameters.AddWithValue("@contact", ct.Text)
                     insertCmd.Parameters.AddWithValue("@gender", gen.SelectedItem.ToString())
                     insertCmd.Parameters.AddWithValue("@birthdate", bd.Text)
-
+                    insertCmd.Parameters.AddWithValue("@section", section.Text)
 
 
 
@@ -158,9 +158,24 @@ Public Class register
 
         End If
         ' Optional: show confirmation
-        MessageBox.Show("You selected: " & course.SelectedItem.ToString(), "Course Selected", MessageBoxButtons.OK, MessageBoxIcon.Information)
         subject.Text = ""
         coursepanel.Visible = False
+        sectionpanel.Visible = True
+        ' Load sections with limit check
+        section.Items.Clear()
+
+        Dim sections As String() = {"1-1", "1-2", "1-3"}
+
+        For Each sect In sections
+            Dim studentCount As Integer = sectioning(course.Text, sect)
+
+            If studentCount >= 1 Then
+                section.Items.Add(sect & " (FULL)")
+            Else
+                section.Items.Add(sect)
+            End If
+        Next
+
     End Sub
 
     Private Sub subject_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles subject.SelectedIndexChanged
@@ -170,6 +185,7 @@ Public Class register
         ' Optional: show confirmation
         MessageBox.Show("You selected: " & subject.SelectedItem.ToString(), "Subject Selected(", MessageBoxButtons.OK, MessageBoxIcon.Information)
         course.Text = ""
+        section.Text = ""
         subjectpanel.Visible = False
     End Sub
 
@@ -181,21 +197,62 @@ Public Class register
         coursepanel.Visible = False
     End Sub
 
-    Private Sub MonthCalendar1_DateChanged(ByVal sender As System.Object, _
-      ByVal e As System.Windows.Forms.DateRangeEventArgs) _
-        Handles MonthCalendar1.DateSelected
+    Private Sub MonthCalendar1_DateChanged(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DateRangeEventArgs) Handles MonthCalendar1.DateSelected
 
         bd.Text = MonthCalendar1.SelectionStart.ToShortDateString()
         MonthCalendar1.Visible = False
     End Sub
-   
+
     Private Sub bd_Click(ByVal sender As Object, ByVal e As EventArgs) Handles bd.Click
         MonthCalendar1.Visible = True
 
     End Sub
-    Private Sub bd_TextChanged(ByVal sender As System.Object, _
-            ByVal e As System.EventArgs) Handles bd.Click
+    Private Sub bd_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bd.Click
 
         MonthCalendar1.Visible = True
     End Sub
+    Private Sub sec_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles section.SelectedIndexChanged
+        If section.SelectedItem Is Nothing Then
+
+        ElseIf section.SelectedItem.ToString().Contains("(FULL)") Then
+            MessageBox.Show("This section " & section.Text & " already reached the limit of 30 students.", "Section Full", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            section.SelectedIndex = -1
+            Return
+        End If
+
+        If section.SelectedIndex <> -1 Then
+            MessageBox.Show("You selected: " & course.SelectedItem.ToString() & section.Text, "Course and Section Selected", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+
+        subject.Text = ""
+        sectionpanel.Visible = False
+    End Sub
+    Private Function sectioning(ByVal course As String, ByVal section As String) As Integer
+        Dim sec As Integer = 0
+
+        Try
+            Using conn As New MySqlConnection(connstring)
+                conn.Open()
+
+                Dim sectioncmd As New MySqlCommand("SELECT COUNT(*) FROM account WHERE course=@course AND section=@section", conn)
+
+                sectioncmd.Parameters.AddWithValue("@course", course)
+                sectioncmd.Parameters.AddWithValue("@section", section)
+
+                Dim result = sectioncmd.ExecuteScalar()
+                If result Is Nothing OrElse IsDBNull(result) Then
+                    sec = 0
+                Else
+                    sec = Convert.ToInt32(result)
+                End If
+
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("Error checking section limit: " & ex.Message)
+        End Try
+
+        Return sec
+    End Function
+
 End Class
